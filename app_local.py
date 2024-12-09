@@ -64,15 +64,18 @@ def predict():
     predicted_rental_price = model.predict(user_input_prediction)
     output = {"Rental Prediction using Built Model": predicted_rental_price[0]}
 
-    #return output
+    
 
     with open('outputs/outputs.json', 'w') as f:
       json.dump(output, f)
+
+
 
     print("####################################### Prediction Started Using Model #######################################")
     print("Model Predicted and Results are uploaded to outputs")
     print("####################################### Prediction Concluded Using Model #######################################")
 
+    return output
 
 if __name__ == "__main__":
     app.run('0.0.0.0',5000)
