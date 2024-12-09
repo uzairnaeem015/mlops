@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: cool_darwin
-        image: uzairnaeem/mlops:latest
+        image: uzairnaeem15/mlops:latest
         ports:
         - containerPort: 5000
