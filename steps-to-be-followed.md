@@ -19,8 +19,6 @@ To install or upgrade scikit-learn, run:
 $ pip install -U scikit-learn
 ```
 
-
-
 ## 2. Running Docker Container Locally
 You can run a Docker container for the machine learning app and make predictions locally.
 
@@ -43,8 +41,6 @@ In another terminal tab, use `curl` to send a prediction request:
 ```bash
 $ curl http://localhost:5000/predict
 ```
-
-
 
 ## 3. Kubernetes Setup
 If you want to run the app on Kubernetes (e.g., for scaling), follow these steps:
@@ -115,8 +111,6 @@ When you no longer need the service, you can delete it with:
 ```bash
 $ kubectl delete -f manifests/mlapp-service.yaml
 ```
-
-
 
 ## 4. Kubeflow Setup
 Kubeflow Pipelines help manage and deploy machine learning workflows.
@@ -248,3 +242,83 @@ aws configiure
 aws s3 ls
 aws s3 mb s3://rajbt123
 
+# HELM FOR PROMETHEUS AND GRAFANA
+
+$ helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+"prometheus-community" has been added to your repositories
+
+$ helm install main-prometheus-release prometheus-community/prometheus --version 26.0.0
+NAME: main-prometheus-release
+LAST DEPLOYED: Fri Nov 29 08:21:23 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+The Prometheus server can be accessed via port 80 on the following DNS name from within your cluster:
+main-prometheus-release-server.default.svc.cluster.local
+
+
+Get the Prometheus server URL by running these commands in the same shell:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=main-prometheus-release" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace default port-forward $POD_NAME 9090
+  kubectl --namespace default port-forward my-prometheus-server-8546644dfd-brwbs 9090
+
+
+The Prometheus alertmanager can be accessed via port 9093 on the following DNS name from within your cluster:        
+main-prometheus-release-alertmanager.default.svc.cluster.local
+
+
+Get the Alertmanager URL by running these commands in the same shell:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=alertmanager,app.kubernetes.io/instance=main-prometheus-release" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace default port-forward $POD_NAME 9093
+#################################################################################
+######   WARNING: Pod Security Policy has been disabled by default since    #####
+######            it deprecated after k8s 1.25+. use                        #####
+######            (index .Values "prometheus-node-exporter" "rbac"          #####
+###### .          "pspEnabled") with (index .Values                         #####
+######            "prometheus-node-exporter" "rbac" "pspAnnotations")       #####
+######            in case you still need it.                                #####
+#################################################################################
+
+
+The Prometheus PushGateway can be accessed via port 9091 on the following DNS name from within your cluster:
+main-prometheus-release-prometheus-pushgateway.default.svc.cluster.local
+
+
+Get the PushGateway URL by running these commands in the same shell:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus-pushgateway,component=pushgateway" -o jsonpath="{.items[0].metadata.name}")
+
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=my-prometheus" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace default port-forward $POD_NAME 9091
+
+For more information on running Prometheus, visit:
+https://prometheus.io/
+
+# GRAFANA
+helm repo add grafana https://grafana.github.io/helm-charts
+helm install main-grafana-release grafana/grafana --version 8.6.3
+
+NAME: main-grafana-release
+LAST DEPLOYED: Fri Nov 29 08:24:32 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get your 'admin' user password by running:
+
+   kubectl get secret --namespace default main-grafana-release -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+2. The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:
+
+   main-grafana-release.default.svc.cluster.local
+
+   Get the Grafana URL to visit by running these commands in the same shell:
+     export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=main-grafana-release" -o jsonpath="{.items[0].metadata.name}")
+     kubectl --namespace default port-forward $POD_NAME 3000
+
+3. Login with the password from step 1 and the username: admin
+#################################################################################
+######   WARNING: Persistence is disabled!!! You will lose your data when   #####
+######            the Grafana pod is terminated.                            #####
+#################################################################################
