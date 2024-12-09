@@ -15,7 +15,7 @@ spec:
         app: mlapp
     spec:
       containers:
-      - name: mlapp-container
+      - name: cool_darwin
         image: mlops:latest
         ports:
         - containerPort: 5000
